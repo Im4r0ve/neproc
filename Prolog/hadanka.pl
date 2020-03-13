@@ -14,3 +14,4 @@
 % následující otázky:
 %
 % Jsem svým vlastním dědečkem?
+%nicht
