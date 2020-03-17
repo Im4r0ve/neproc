@@ -71,7 +71,42 @@ flat_( [[H | T] | T2] , A, R) :-
 %
 % transp([[a],[b,c],[d]], R).
 % false.
+% access([[a,b],[c,d],[e,f]], 1,2, Value).
+% get_row([[a,b],[c,d],[e,f]], 1, Row).
 
+%pristup k prvku v 2D poli
+access(Matrix, I, J, Value) :-
+    nth0(I, Matrix, Row),
+    nth0(J, Row, Value).
+
+%vrati stlpec
+get_col(Matrix, J ,Col) :-
+    findall(Value, access(Matrix, _, J, Value), Col).
+
+%vrati dlzku najdlhsieho pola alebo fail
+check_size([],_):-!.
+check_size([H|T], Max_length) :-
+    length(H, Len),
+    Max_length = Len,
+    check_size(T, Max_length). 
+
+%transponuje maticu
+transp([],[]).
+transp(In_matrix, Out_matrix) :-
+    check_size(In_matrix,Len),
+    Len2 is Len -1,
+    transp_(In_matrix, Len2, Out_matrix1),
+    rev(Out_matrix1,Out_matrix).
+
+transp_(_,-1,[]) :-!.
+transp_(Matrix,Len, Out_matrix) :-
+    Len > -1,    
+    get_col(Matrix, Len, Col),
+    Len2 is Len - 1,
+    transp_(Matrix, Len2, Out),
+    Out_matrix = [Col|Out].
+
+    
 
 
 
