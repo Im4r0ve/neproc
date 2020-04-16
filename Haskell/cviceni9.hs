@@ -45,7 +45,7 @@ test3 = (+)     -- Konec where
 -- Ukázali jsme si, že se funkce dají vracet jako návratové hodnoty a používat
 -- jako argumenty. Funkce také můžeme ukládat do datových struktur.
 
-fns :: (Ord a, Integral a) => [a -> a]
+fns ::  Integral a => [a -> a]
 fns = [(+2), (*3), max 2, (`div` 2)]
 
 applyArg :: a -> (a -> b) -> b

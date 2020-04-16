@@ -155,16 +155,15 @@ pyth3 = pyth 3.0
 -- |        |
 -- vstup    výstup
 --
-
 add :: Int -> Int -> Int
 -- add x y = x + y
 -- lépe
 add = (+)
 
 addTwo :: Int -> Int
--- addTwo x = add 2 x
+addTwo x = add x 2
 -- lépe:
-addTwo = add 2
+--addTwo = add 2
 
 -- nebo
 -- addTwo = (+) 2
