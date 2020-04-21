@@ -24,10 +24,10 @@ encode x ((first,second): xs) =
 -- "hello"
 
 rleDecode :: [(Int, a)] -> [a]
-rleDecode a = foldl (decode) [] a
+rleDecode x = foldl (decode) [] x
     where
-    decode a (0,_) = a
-    decode a (i,ch) = decode (a ++ [ch]) (i-1, ch)
+        decode x (0,_) = x
+        decode x (i,ch) = decode (x ++ [ch]) (i-1, ch)
 -- 2) Definujte nekonečný seznam všech prvočísel. Pokuste se o efektivní řešení.
 
 -- >>> take 5 primes
@@ -37,13 +37,21 @@ primes :: [Integer]
 primes = 2 : 3 : filter (isPrime primes) [5,7..]
 
 isPrime :: [Integer] -> Integer -> Bool
+isPrime [] _ = False --not needed
 isPrime (x:xs) n
     | n < x*x = True
     | (n `mod` x) == 0 = False
     | otherwise = isPrime xs n
 
 -- 3) Implementujte mergesort.
-
+-- Prvním argumentem je funkce, která provádí porovnávání.
+--
+-- >>> sortWith (<) [10,9..1]
+-- [1,2,3,4,5,6,7,8,9,10]
+--
+-- >>> sortWith (>) [10,9..1]
+-- [10,9,8,7,6,5,4,3,2,1]
+--
 mergeWith :: (a -> a -> Bool) -> [a] -> [a] -> [a]
 mergeWith p [] x = x
 mergeWith p x [] = x
@@ -53,22 +61,17 @@ mergeWith p (x:xs) (y:ys)
 
 splitInHalf :: [a] -> ([a],[a])
 splitInHalf xs = (take n xs , drop n xs)
-    where n = (length xs) `div` 2
+    where 
+        n = (length xs) `div` 2
 
 sortWith  :: (a -> a -> Bool) -> [a] -> [a]
 sortWith p xs
     | length xs > 1 = mergeWith p (sortWith p lhs) (sortWith p rhs)
     | otherwise = xs
-    where (lhs , rhs) = splitInHalf xs
+    where 
+        (lhs , rhs) = splitInHalf xs
 
--- Prvním argumentem je funkce, která provádí porovnávání.
---
--- >>> sortWith (<) [10,9..1]
--- [1,2,3,4,5,6,7,8,9,10]
---
--- >>> sortWith (>) [10,9..1]
--- [10,9,8,7,6,5,4,3,2,1]
---
+
 -- BONUS)
 --
 -- Implementujte následující funkce:
@@ -80,34 +83,26 @@ sortWith p xs
 -- ["ab","ac","ad","bc","bd","cd"]
 --
 combinations :: Int -> [a] -> [[a]]
-combinations _ [] = []
-combinations 1 xs = map (:[]) xs
 combinations n xs
-    | n < 0         = []
+    | n < 1         = []
     | n > length xs = []
-    | otherwise     = combine n (length xs) xs
-    where      
-        combine max depth (y:ys)
-            | max <= depth   = [y:ws | ws <- combine (max - 1) (depth - 1) ys] ++ combine max (depth - 1) ys
-            | max == depth  = [y:ys]
-            | otherwise     = []
-
+    | otherwise     = combine n xs
+    where   
+        combine 0 _      = [[]]
+        combine _ []     = []         
+        combine m (y:ys) = map (y:) (combine (m-1) ys) ++ combine m ys
 -- permutations x vygeneruje seznam všech permutací. Na pořadí permutací ve
 -- výsledném seznamu nezáleží.
 --
 -- >>> permutations "abc"
 -- ["abc","bac","bca","acb","cab","cba"]
 --
-times (x:xs) = [(x1, y1) | x1 <- x, y1 <- xs]
-
---perms xs = [x : ps | (y,ys) <- selections xs, ps <- perms ys]
---selections xs = [(x,xs\\[x]) | x <- xs]
-
---selections []     = []
---selections (x:xs) = (x,xs) : [(y,x:ys) | (y,ys) <- selections xs]
-
 permutations :: [a] -> [[a]]
-permutations = undefined
+permutations [] = [[]]
+permutations xs = [ y:zs | (y,ys) <- choose xs, zs <- permutations ys]
+  where choose []     = []
+        choose (x:xs) = (x,xs) : [ (y,x:ys) | (y,ys) <- choose xs ]
+
 
 -- Pomocí těchto funkcí definujte "variace" (občas najdete v české literatuře,
 -- v angličtině pro to termín asi neexistuje): kombinace, kde záleží na pořadí
@@ -116,4 +111,6 @@ permutations = undefined
 -- ["ab","ba","ac","ca","bc","cb"]
 --
 variations :: Int -> [a] -> [[a]]
-variations = undefined
+variations _ [] = []
+variations n xs = concat [permutations comb | comb <- combinations n xs]
+
